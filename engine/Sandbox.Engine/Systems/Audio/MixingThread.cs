@@ -290,6 +290,20 @@ static class MixingThread
 		{
 			ref var v = ref voices[i];
 			if ( v.Sampler is null ) continue;
+
+			bool samplerDone = !v.Sampler.ShouldContinueMixing;
+			if ( samplerDone && v.Handle is not null && !v.Handle.SamplerEnded )
+			{
+				v.Handle.SamplerEnded = true;
+				if ( v.Reverb is not null && v.Reverb.IsValid && v.ReverbRoom.Mix > 0.08f )
+				{
+					float tail = MathF.Max( v.ReverbRoom.DecayTimeMid, v.ReverbRoom.DecayTimeHigh );
+					if ( tail > 0.1f ) v.Handle.ReverbTailUntil = tail;
+				}
+			}
+
+			if ( v.Handle is not null && !v.Handle.ReverbTailUntil ) continue;
+
 			if ( v.Sampler.ShouldContinueMixing && !v.IsFadingOut ) continue;
 			if ( v.FadeOutTimer == false ) continue;
 

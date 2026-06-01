@@ -26,6 +26,8 @@ public partial class SoundHandle : IValid, IDisposable
 	internal ReverbSnapshot SourceRoom { get; set; }
 	internal int OcclusionPhase { get; set; } = -1;
 	internal int DiffractionTick;
+	internal RealTimeUntil ReverbTailUntil;
+	internal bool SamplerEnded;
 
 	internal NativeReverbEffect GetOrCreateReverb()
 	{
@@ -143,18 +145,35 @@ public partial class SoundHandle : IValid, IDisposable
 	public bool Finished { get; set; }
 
 	/// <summary>
-	/// Enable the sound reflecting off surfaces.
+	/// Enable reverb simulation for this sound (reflections/late reverb).
 	/// </summary>
-	public bool Reflections { get; set; } = true;
+	public bool ReverbEnabled { get; set; } = true;
+
+	/// <summary>Legacy alias for <see cref="ReverbEnabled"/>.</summary>
+	[Obsolete( "Use ReverbEnabled instead." )]
+	public bool Reflections
+	{
+		get => ReverbEnabled;
+		set => ReverbEnabled = value;
+	}
 
 	/// <summary>
 	/// Allow this sound to be occluded by geometry etc
 	/// </summary>
-	public bool Occlusion { get; set; } = true;
+	public bool OcclusionEnabled { get; set; } = true;
+
+	/// <summary>Legacy alias for <see cref="OcclusionEnabled"/>.</summary>
+	[Obsolete( "Use OcclusionEnabled instead." )]
+	public bool Occlusion
+	{
+		get => OcclusionEnabled;
+		set => OcclusionEnabled = value;
+	}
 
 	/// <summary>
-	/// Legacy occlusion radius setting. Retained for compatibility but not used by the simulation.
+	/// Legacy occlusion radius setting. No longer used by the simulation.
 	/// </summary>
+	[Obsolete( "OcclusionRadius is no longer used by the simulation." ), Hide]
 	public float OcclusionRadius { get; set; } = 32.0f;
 
 	/// <summary>
@@ -165,7 +184,7 @@ public partial class SoundHandle : IValid, IDisposable
 	/// <summary>
 	/// How much this sound contributes to room reverb. 1 = full reverb, 0 = completely dry.
 	/// </summary>
-	public float ReverbAmount { get; set; } = 1.0f;
+	public float Reverb { get; set; } = 1.0f;
 
 	/// <summary>
 	/// Should the sound get absorbed by air, so it sounds different at distance
@@ -573,7 +592,7 @@ public partial class SoundHandle : IValid, IDisposable
 			LipSync = LipSync,
 			Handle = this,
 			Reverb = reverb,
-			ReverbRoom = Reflections && reverb is not null ? SourceRoom : default,
+			ReverbRoom = ReverbEnabled && reverb is not null ? SourceRoom : default,
 		};
 	}
 
