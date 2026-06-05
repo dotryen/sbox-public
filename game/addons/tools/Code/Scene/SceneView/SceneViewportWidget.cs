@@ -773,6 +773,7 @@ public partial class SceneViewportWidget : Widget
 				ViewMode.Top2d => new Vector2( size.x, size.y ),
 				ViewMode.Front2d => new Vector2( size.y, size.z ),
 				ViewMode.Side2d => new Vector2( size.z, size.x ),
+				ViewMode.Flat2d => new Vector2( size.x, size.y ),
 				_ => new Vector2( size.x, size.y )
 			};
 
