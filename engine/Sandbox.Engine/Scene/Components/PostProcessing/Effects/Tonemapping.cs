@@ -106,8 +106,19 @@ public class Tonemapping : BasePostProcess<Tonemapping>
 		camera.AutoExposure.Rate = GetWeighted( x => x.Rate, 1 );
 	}
 
-	public override int ComponentVersion => 3;
+	public override int ComponentVersion => 4;
 
+	/// <summary>
+	/// Remap Exposure Compensation to just Exposure
+	/// </summary>
+	[Expose, JsonUpgrader( typeof( Tonemapping ), 4 )]
+	static void Upgrader_v4(JsonObject obj) {
+		if ( obj.TryGetPropertyValue( "ExposureCompensation", out var compensation ) )
+		{
+			obj["Exposure"] = (float)compensation;
+		}
+	}
+	
 	/// <summary>
 	/// Remove Exposure Bias
 	/// this doesn't make much sense since it's tied to only HableFilmic and does the same thing as ExposureCompensation
