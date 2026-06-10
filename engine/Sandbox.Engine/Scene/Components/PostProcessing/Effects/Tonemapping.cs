@@ -54,6 +54,9 @@ public class Tonemapping : BasePostProcess<Tonemapping>
 
 	[ShowIf( nameof( Mode ), TonemappingMode.HableFilmic )]
 	[Property] public ExposureColorSpaceEnum ExposureMethod { get; set; } = ExposureColorSpaceEnum.RGB;
+	
+	[Property, Range( -5.0f, 5.0f )]
+	public float Exposure { get; set; } = 0.0f;
 
 	private static Material Shader = Material.FromShader( "shaders/tonemapping/tonemapping.shader" );
 
@@ -63,6 +66,8 @@ public class Tonemapping : BasePostProcess<Tonemapping>
 
 		Attributes.SetComboEnum( "D_TONEMAPPING", Mode );
 		Attributes.SetComboEnum( "D_EXPOSUREMETHOD", ExposureMethod );
+		Attributes.Set( "Exposure", MathF.Pow( 2, GetWeighted( x => x.Exposure ) ) );
+		Attributes.Set( "ExposureMix", GetWeighted(x => x.AutoExposureEnabled ? 1f : 0f ) );
 
 		var blit = BlitMode.WithBackbuffer( Shader, Stage.Tonemapping, 0 );
 		Blit( blit, "Tonemapping" );
@@ -91,8 +96,8 @@ public class Tonemapping : BasePostProcess<Tonemapping>
 	{
 		if ( !camera.IsValid() ) return;
 
-		camera.AutoExposure.Enabled = AutoExposureEnabled;
-		camera.AutoExposure.Compensation = GetWeighted( x => x.ExposureCompensation, 0 );
+		camera.AutoExposure.Enabled = true;
+		camera.AutoExposure.Compensation = GetWeighted( x => x.Exposure, 0 );
 		camera.AutoExposure.MinimumExposure = GetWeighted( x => x.MinimumExposure, 1 );
 		camera.AutoExposure.MaximumExposure = GetWeighted( x => x.MaximumExposure, 3 );
 		camera.AutoExposure.Rate = GetWeighted( x => x.Rate, 1 );
