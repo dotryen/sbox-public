@@ -86,12 +86,15 @@ public class Tonemapping : BasePostProcess<Tonemapping>
 	[Property, Group( "Auto Exposure" ), Range( 0.0f, 5.0f ), ShowIf( nameof( AutoExposureEnabled ), true )]
 	public float MaximumExposure { get; set; } = 3.0f;
 
-	[Property, Group( "Auto Exposure" ), Range( -5.0f, 5.0f ), ShowIf( nameof( AutoExposureEnabled ), true )]
-	public float ExposureCompensation { get; set; } = 0.0f;
-
 	[Property, Group( "Auto Exposure" ), Range( 1.0f, 10.0f ), ShowIf( nameof( AutoExposureEnabled ), true )]
 	public float Rate { get; set; } = 1.0f;
 
+	[Obsolete("Use Exposure instead.")]
+	public float ExposureCompensation {
+		get => Exposure;
+		set => Exposure = value;
+	}
+	
 	void UpdateExposure( CameraComponent camera )
 	{
 		if ( !camera.IsValid() ) return;
