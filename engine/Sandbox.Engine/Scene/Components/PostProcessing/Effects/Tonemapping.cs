@@ -42,7 +42,7 @@ public class Tonemapping : BasePostProcess<Tonemapping>
 		/// <summary>
 		/// Khronos' neutral tonemapper, preserves color as much as possible while eliminating artifacts.
 		/// </summary>
-		[Title("Khronos PBR Neutral")]
+		[Title( "Khronos PBR Neutral" )]
 		KhronosPBRNeutral
 	}
 
