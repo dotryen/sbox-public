@@ -54,7 +54,7 @@ public class Tonemapping : BasePostProcess<Tonemapping>
 
 	[ShowIf( nameof( Mode ), TonemappingMode.HableFilmic )]
 	[Property] public ExposureColorSpaceEnum ExposureMethod { get; set; } = ExposureColorSpaceEnum.RGB;
-	
+
 	[Property, Range( -5.0f, 5.0f )]
 	public float Exposure { get; set; } = 0.0f;
 
@@ -67,7 +67,7 @@ public class Tonemapping : BasePostProcess<Tonemapping>
 		Attributes.SetComboEnum( "D_TONEMAPPING", Mode );
 		Attributes.SetComboEnum( "D_EXPOSUREMETHOD", ExposureMethod );
 		Attributes.Set( "Exposure", MathF.Pow( 2, GetWeighted( x => x.Exposure ) ) );
-		Attributes.Set( "ExposureMix", GetWeighted(x => x.AutoExposureEnabled ? 1f : 0f ) );
+		Attributes.Set( "ExposureMix", GetWeighted( x => x.AutoExposureEnabled ? 1f : 0f ) );
 
 		var blit = BlitMode.WithBackbuffer( Shader, Stage.Tonemapping, 0 );
 		Blit( blit, "Tonemapping" );
@@ -89,12 +89,13 @@ public class Tonemapping : BasePostProcess<Tonemapping>
 	[Property, Group( "Auto Exposure" ), Range( 1.0f, 10.0f ), ShowIf( nameof( AutoExposureEnabled ), true )]
 	public float Rate { get; set; } = 1.0f;
 
-	[Obsolete("Use Exposure instead.")]
-	public float ExposureCompensation {
+	[Obsolete( "Use Exposure instead." )]
+	public float ExposureCompensation
+	{
 		get => Exposure;
 		set => Exposure = value;
 	}
-	
+
 	void UpdateExposure( CameraComponent camera )
 	{
 		if ( !camera.IsValid() ) return;
@@ -112,13 +113,14 @@ public class Tonemapping : BasePostProcess<Tonemapping>
 	/// Remap Exposure Compensation to just Exposure
 	/// </summary>
 	[Expose, JsonUpgrader( typeof( Tonemapping ), 4 )]
-	static void Upgrader_v4(JsonObject obj) {
+	static void Upgrader_v4( JsonObject obj )
+	{
 		if ( obj.TryGetPropertyValue( "ExposureCompensation", out var compensation ) )
 		{
 			obj["Exposure"] = (float)compensation;
 		}
 	}
-	
+
 	/// <summary>
 	/// Remove Exposure Bias
 	/// this doesn't make much sense since it's tied to only HableFilmic and does the same thing as ExposureCompensation
